@@ -1,7 +1,7 @@
 """
-Il codice calcola l'energia per nucleone in materia assimmetrica
-con il modelo sigma-omega in campo medio relativistico a T = 0
-considerando l'equilibrio beta tra protoni elettroni e neutroni
+This code computes the energy per nucleon in asymmetric matter
+with the sigma-omega model in relativistic mean field at T = 0
+considering beta equilibrium between protons, electrons and neutrons
 """
 import time
 import numpy as np
@@ -12,28 +12,28 @@ from scipy.optimize import root
 #\hbar/c in MeV fermi
 hbc = 197.327
 
-#masse barioni
+#baryon masses
 mass_p = 938.27203
 mass_n = 939.56536
 m_n = np.array([mass_p, mass_n])/hbc
 
-#masse mesoni
+#meson masses
 m_sg = 550.1238
 m_om = 783.0000
 m_rh = 763.0000
 m_m = np.array([m_sg, m_om, m_rh])/hbc
 
-#masse leptoni
+#lepton masses
 m_el = 0.51099907 /hbc
 
-#costanti di accopiamento a nb_sat
+#coupling constants at nb_sat
 g_sg_sat = 10.5396
 g_om_sat = 13.0189
-g_rh_sat = 3.6836 #qui è già in conto il fattore un mezzo
+g_rh_sat = 3.6836 #we already considered 1/2
 g_sat = np.array([g_sg_sat, g_om_sat, g_rh_sat])
 
-#array per modellare la dipendeza delle costanti di acc
-#nell'ordine  sigma,  omega,  rho
+#array to model the dependence on the coupling constants
+#in order     sigma,  omega,  rho
 a = np.array([1.3881, 1.3892, 0.5647])
 b = np.array([1.0943, 0.9240])
 c = np.array([1.7057, 1.4620])
@@ -41,24 +41,23 @@ d = np.array([0.4421, 0.4775])
 
 def f(n, i, derive=False):
     """
-    funzione che modelliza l'andamento delle
-    costati di accopiamento in fuzione di nb
-    per il mesone sigma e il mesone omega
-    A seconda del valore derive restituisce
-    la derivata
+    function that models the behaviour of the
+    coupling constants depending on nb
+    for the sigma meson and the omega meson
+    It returns the derivative depending on the value of derive
 
     Parameters
     ----------
     n : float or 1darray
-        densita barionica totale
+        total baryon density
     i : int
-        è una flag
+        it is a flag
         i = 0 sigma
         i = 1 omega
     derive : boolen
-        è una flag se True restituisce la derivata
+        it is a flag if True returns the derivative
 
-    Returns
+    Return
     ----------
     derive=False
         g_n : float or 1darray
@@ -85,16 +84,16 @@ def f(n, i, derive=False):
 
 def g(n, derive=False):
     """
-    funzione che modelliza l'andamento della
-    costate di accopiamento in fuzione di nb
-    per il mesone rho
+    function that models the behaviour of the
+    coupling constant depending on nb
+    for the rho meson
 
     Parameters
     ----------
     x : float or 1darray
         nb/nb_sat
     derive : boolen
-        è una flag se True restituisce la derivata
+        it is a flag if True returns the derivative
 
     Returns
     ----------
@@ -119,19 +118,19 @@ def g(n, derive=False):
 
 def ns(k, M):
     """
-    integrale per l'equazione di sigma
+    integral for the sigma equation
 
     Parameters
     ----------
     k : float
-        impulso, variabile di integrazione
+        momentum, integration variable
     M : float
-        massa efficace m - g_sg * sigma
+        effective mass m - g_sg * sigma
 
     Return
     ----------
     x_dot : float
-        funzione da integrare
+        integrand function
     """
 
     num = k**2 * M
@@ -143,19 +142,19 @@ def ns(k, M):
 
 def ene(k, M):
     """
-    integrale per l'energia dei nucleoni
+    integral for the nucleons energy
 
     Parameters
     ----------
     k : float
-        impulso, variabile di integrazione
+        momentum, integration variable
     M : float
-        massa efficace m - g_sg * sigma
+        effective mass m - g_sg * sigma
 
     Return
     ----------
     x_dot : float
-        funzione da integrare
+        integrand function
     """
     eps = k**2 * np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
@@ -165,19 +164,19 @@ def ene(k, M):
 
 def pre(k, M):
     """
-    integrale per la pressione dei nucleoni
+    integral for the nucleons pressure
 
     Parameters
     ----------
     k : float
-        impulso, variabile di integrazione
+        momentum, integration variable
     M : float
-        massa efficace m - g_sg * sigma
+        effective mass m - g_sg * sigma
 
     Return
     ----------
     x_dot : float
-        funzione da integrare
+        integrand function
     """
     eps = k**2 / np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
@@ -187,16 +186,16 @@ def pre(k, M):
 
 def Inte(f, kf, M):
     """
-    funzione tramite scipy calcola l'integrale
+    this function computes the integral via scipy
 
     Parameters
     ----------
     f : function
-        funzione da integrare
+        integrand function
     kf : float
-        impulso di fermi, estremo superiore di integrazione
+        fermi momentum, integral upper bound
     M : float
-        massa efficace m - g_sg * sigma
+        effective mass m - g_sg * sigma
 
     Return
     -----------
@@ -209,24 +208,24 @@ def Inte(f, kf, M):
 
 def sistema(V, nb, g_sg, g_om, g_rh):
     """
-    sistema di equazini da risolvere
+    system to solve
 
     Parameters
     ----------
     V : 1darray
-        vettore delle incognite
+        array of the variables
     nb : float
-        densità barionica totale
+        total baryonic density
     g_sg : float
-        costante di accopiamento per sigma a densita nb = n+p
+        coupling constant for sigma at density nb = n+p
     g_om : float
-        costante di accopiamento per omega a densita nb = n+p
+        coupling constant for omega at density nb = n+p
     g_rh : float
-        costante di accopiamento per rho   a densita nb = n+p
+        coupling constant for rho   at density nb = n+p
 
     Returns
     ----------
-    lista di equazioni da risolvere
+    list of equations to solve
     r1 = 0
     r2 = 0
     r3 = 0
@@ -234,20 +233,20 @@ def sistema(V, nb, g_sg, g_om, g_rh):
     r5 = 0
     """
     sig, omg, rho, n, p = V
-    #impulsi di fermi
+    #fermi momenta
     kf_p = (3*(np.pi**2)*p)**(1/3)
     kf_n = (3*(np.pi**2)*n)**(1/3)
-    #potenziali chimici
+    #chemical potentials
     mu_e = np.sqrt(kf_p**2 + m_el**2)
     mu_p = np.sqrt(kf_p**2 + m_n[0]**2)
     mu_n = np.sqrt(kf_n**2 + m_n[1]**2)
-    #masse efficaci
+    #effective masses
     m_eff_p = m_n[0] - sig*g_sg
     m_eff_n = m_n[1] - sig*g_sg
-    #Integrali numerici per sigma
+    #numerical integrals for sigma
     I_p = Inte(ns, kf_p, m_eff_p)
     I_n = Inte(ns, kf_n, m_eff_n)
-    #equazioni da risolvere
+    #equations to solve
     r1 = sig - g_sg/m_m[0]**2 * (I_p + I_n)
     r2 = omg - g_om/m_m[1]**2 * (n + p)
     r3 = rho - g_rh/m_m[2]**2 * (n - p)
@@ -257,95 +256,95 @@ def sistema(V, nb, g_sg, g_om, g_rh):
 
 def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
     """
-    Calcolo dell'energia totale del sistema
+    Computation of the system's total energy
 
     Parameters
     ----------
     nb_dens : 1darray
-        densità barionica totale
+        total baryonic density
     n_pro, n_neu : 1darrray
-        arradi delle densità di protoni e neutroni
+        array of the protons and neutrons densities
     sigma, omega, rho : 1darray
-        array che contengono le soluzioni per i mesoni
+        array with the solutions for the mesons
 
     Retunrs
     ----------
     energ : 1darray
-        array contenete l'enrgia totale
+        array for the total energy
     """
     number_dens = len(nb_dens)
-    #array che conterrà l'energia
+    #array for the energy
     energ = np.zeros(number_dens)
 
     for i, nb in enumerate(nb_dens):
-        #impulso di fermi
+        #fermi momenta
         kf_n = (3*(np.pi**2)*n_neu[i])**(1/3)
         kf_p = (3*(np.pi**2)*n_pro[i])**(1/3)
-        #costanti al varaire dellla densità
+        #constants as the density varies
         g_sg = f(nb, 0)
-        #masse efficaci
+        #effective masses
         m_eff_p = m_n[0] - sigma[i]*g_sg
         m_eff_n = m_n[1] - sigma[i]*g_sg
-        #energia mesoni
+        #mesons energy
         ene_m = 0.5*(m_m[0]**2*sigma[i]**2 + m_m[1]**2*omega[i]**2 + m_m[2]**2*rho[i]**2)
-        #energie nucleoni
+        #nucleons energies
         ene_p = Inte(ene, kf_p, m_eff_p)
         ene_n = Inte(ene, kf_n, m_eff_n)
-        #energia totale sistema
+        #system's total energy
         energ[i] =  ene_m + ene_p + ene_n
 
     return energ
 
 def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
     """
-    Calcolo pressione totale del sistema
+    Computation of the system's total pressure
 
     Parameters
     ----------
     nb_dens : 1darray
-        densità barionica totale
+        total baryonic density
     n_pro, n_neu : 1darrray
-        arradi delle densità di protoni e neutroni
+        array for the protons and neutrons densities
     sigma, omega, rho : 1darray
-        array che contengono le soluzioni per i mesoni
+        array for the mesons solutions
 
     Retunrs
     ----------
     press : 1darray
-        array contenete la pressione totale
+        array for the total pressure
     """
     number_dens = len(nb_dens)
-    #array che conterrà la pressione
+    #array for the pressure
     press = np.zeros(number_dens)
 
     for i, nb in enumerate(nb_dens):
-        #impulso di fermi
+        #fermi momenta
         kf_n = (3*(np.pi**2)*n_neu[i])**(1/3)
         kf_p = (3*(np.pi**2)*n_pro[i])**(1/3)
-        #costanti al varaire dellla densità
+        #constants as the density varies
         g_sg = f(nb, 0)
-        #masse efficaci
+        #effective masses
         m_eff_p = m_n[0] - sigma[i]*g_sg
         m_eff_n = m_n[1] - sigma[i]*g_sg
-        #derivate delle costanti al variare della densità
+        #constants derivatives as the density varies
         dg_sg = f(nb, 0, derive=True)
         dg_om = f(nb, 1, derive=True)
         dg_rh = g(nb, derive=True)
-        #tempini di pressione dei nucleoni
+        #nucleons pressure terms
         pre_p = Inte(pre, kf_p, m_eff_p)
         pre_n = Inte(pre, kf_n, m_eff_n)
-        #terimini di derivara dei mesoni
+        #mesons derivative terms
         I_p = Inte(ns, kf_p, m_eff_p)
         I_n = Inte(ns, kf_n, m_eff_n)
         pre_m1 = dg_om*omega[i]*(n_neu[i]+n_pro[i]) + dg_rh*rho[i]*(n_neu[i]-n_pro[i]) - dg_sg*sigma[i]*(I_p+I_n)
-        #termine pressione mesoni
+        #mesons pressure term
         pre_m2 = -0.5*(m_m[0]**2*sigma[i]**2 - m_m[1]**2*omega[i]**2 - m_m[2]**2*rho[i]**2)
-        #pressione totale del sistema
+        #system's total pressure
         press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2
 
     return press
 
-#parametri calcolo
+#computation parameters
 number_dens = 300
 min_dens = 0.01
 max_dens = 1#0.3
@@ -353,14 +352,14 @@ nb_sat = 0.152
 
 nb_dens = np.linspace(min_dens, max_dens, number_dens)
 
-#array che conterrano le soluzioni
+#array for the solutions
 sigma = np.zeros(number_dens + 1)
 omega = np.zeros(number_dens + 1)
 rho   = np.zeros(number_dens + 1)
 n_pro = np.zeros(number_dens + 1)
 n_neu = np.zeros(number_dens + 1)
 
-#valori inizali
+#initial values
 sigma[0], omega[0], rho[0] = min_dens * g_sat/m_m**2
 n_pro[0] = 0.001 * min_dens
 n_neu[0] = 0.999 * min_dens
@@ -368,38 +367,38 @@ n_neu[0] = 0.999 * min_dens
 
 t0 = time.time()
 
-for i, nb in enumerate(nb_dens): #ciclo sulle densità
-    #costanti al varaire dellla densità
+for i, nb in enumerate(nb_dens): #loop over densities
+    #constants as the density varies
     g_sg = f(nb, 0)
     g_om = f(nb, 1)
     g_rh = g(nb)
-    #punto di parteza, dipoende da i per velocizzare la soluzione
+    #starting point depending on i to speed up the computation
     start = (sigma[i], omega[i], rho[i], n_neu[i], n_pro[i])
-    #risolvo il sistema e conservo la soluzione
+    #we solve the system and keep the solution
     sol = root(sistema , start, args=(nb, g_sg, g_om, g_rh), tol=1e-10, method='hybr')
     sigma[i+1], omega[i+1], rho[i+1], n_neu[i+1], n_pro[i+1] = sol.x
 
-#elimino il valore inizale
+#we delete the initial value
 sigma = sigma[1:]
 omega = omega[1:]
 rho   = rho[1:]
 n_pro = n_pro[1:]
 n_neu = n_neu[1:]
 
-#calcolo dell'energia e della pressione
+#energy and pressure computation
 ene_nb = Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho)
 pre_nb = Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho)
 
-#enrgia per nucleone
+#enrgy per nucleon
 E_over_A =  hbc*(ene_nb/nb_dens)
-#pressione
+#pressure
 pre_nb *= hbc
 
 
 dt = time.time() - t0
 print(f'tempo impeigato: {dt}')
 
-#plot energia
+#energy plot
 plt.figure(1)
 plt.title('Energia per nucleone')
 plt.ylabel('E/A [Mev]')
@@ -407,7 +406,7 @@ plt.xlabel('densita [$fm^{-3}$]')
 plt.grid()
 plt.plot(nb_dens, E_over_A)
 
-#plot abbondanze
+#abundances plot
 plt.figure(2)
 plt.title('Abbondanze in funzione della densità tottale')
 plt.plot(nb_dens, n_pro/nb_dens, label='np/nb')
@@ -417,7 +416,7 @@ plt.legend(loc='best')
 plt.yscale('log')
 plt.grid()
 
-#plot pressione
+#pressure plot
 plt.figure(3)
 plt.title('Pressione')
 plt.ylabel('P [Mev/$fm^3$]')
