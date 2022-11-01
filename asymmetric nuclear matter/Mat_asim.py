@@ -252,6 +252,7 @@ def sistema(V, nb, g_sg, g_om, g_rh):
     r3 = rho - g_rh/m_m[2]**2 * (n - p)
     r4 = nb - n - p
     r5 = mu_n - mu_p - mu_e + 2*g_rh*rho
+
     return[r1 , r2, r3, r4, r5]
 
 def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
