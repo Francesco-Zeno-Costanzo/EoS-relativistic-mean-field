@@ -226,7 +226,7 @@ def sistema(V, nb, g_sg, g_om, g_rh, muon):
     g_rh : float
         coupling constant for rho   at density nb = n+p
     muon : boolean
-        it is a flag if True there are muons
+        it is a flag, if True there are muons
 
     Returns
     ----------
@@ -250,7 +250,7 @@ def sistema(V, nb, g_sg, g_om, g_rh, muon):
     #numerical integrals for sigma
     I_p = Inte(ns, kf_p, m_eff_p)
     I_n = Inte(ns, kf_n, m_eff_n)
-    #chemical potentials for baryon ad electron
+    #chemical potentials for baryons and electrons
     mu_p = np.sqrt(kf_p**2 + m_n[0]**2)
     mu_n = np.sqrt(kf_n**2 + m_n[1]**2)
     mu_e = np.sqrt(kf_e**2 + m_l[0]**2)
@@ -391,7 +391,7 @@ n_ele[0] = 0.01 * min_dens
 n_muo[0] = 0.00 * min_dens
 
 t0 = time.time()
-#boolean variable become True if there are muons
+#boolean variable becomes True if there are muons
 muon = False
 
 for i, nb in enumerate(nb_dens): #loop over densities
@@ -405,7 +405,7 @@ for i, nb in enumerate(nb_dens): #loop over densities
     sol = root(sistema , start, args=(nb, g_sg, g_om, g_rh, muon), tol=1e-10, method='hybr')
     sigma[i+1], omega[i+1], rho[i+1], n_neu[i+1], n_pro[i+1], n_ele[i+1], n_muo[i+1] = sol.x
 
-    #compute fermi momenta squared for muons
+    #it computes muons' fermi momenta squared
     kf_e = (3*(np.pi**2)*n_ele[i+1])**(1/3)
     kf_m_2 = kf_e**2 + m_l[0]**2 - m_l[1]**2
 
