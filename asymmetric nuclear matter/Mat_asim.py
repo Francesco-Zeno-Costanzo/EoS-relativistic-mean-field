@@ -162,7 +162,7 @@ def ene(k, M):
     return x_dot
 
 
-def pre(k, M):
+def pre_bar(k, M):
     """
     integral for the nucleons pressure
 
@@ -180,6 +180,28 @@ def pre(k, M):
     """
     eps = k**2 / np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
+
+    return x_dot
+
+
+def pre_lep(k, M):
+    """
+    integral for the leptons pressure
+
+    Parameters
+    ----------
+    k : float
+        momentum, integration variable
+    M : float
+        effective mass m - g_sg * sigma
+
+    Return
+    ----------
+    x_dot : float
+        integrand function
+    """
+    eps = k**4 / np.sqrt(k**2 + M**2)
+    x_dot = eps/(3*np.pi**2)
 
     return x_dot
 
@@ -332,8 +354,10 @@ def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         dg_om = f(nb, 1, derive=True)
         dg_rh = g(nb, derive=True)
         #nucleons pressure terms
-        pre_p = Inte(pre, kf_p, m_eff_p)
-        pre_n = Inte(pre, kf_n, m_eff_n)
+        pre_p = Inte(pre_bar, kf_p, m_eff_p)
+        pre_n = Inte(pre_bar, kf_n, m_eff_n)
+        #electrons pressure term
+        pre_e = Inte(pre_lep, kf_p, m_el)
         #mesons derivative terms
         I_p = Inte(ns, kf_p, m_eff_p)
         I_n = Inte(ns, kf_n, m_eff_n)
@@ -341,7 +365,7 @@ def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #mesons pressure term
         pre_m2 = -0.5*(m_m[0]**2*sigma[i]**2 - m_m[1]**2*omega[i]**2 - m_m[2]**2*rho[i]**2)
         #system's total pressure
-        press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2
+        press[i] = (1/3)*(pre_p + pre_n) + pre_e + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2
 
     return press
 

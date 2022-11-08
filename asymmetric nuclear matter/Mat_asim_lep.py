@@ -187,6 +187,28 @@ def pre(k, M):
     return x_dot
 
 
+def pre_lep(k, M):
+    """
+    integral for the leptons pressure
+
+    Parameters
+    ----------
+    k : float
+        momentum, integration variable
+    M : float
+        effective mass m - g_sg * sigma
+
+    Return
+    ----------
+    x_dot : float
+        integrand function
+    """
+    eps = k**4 / np.sqrt(k**2 + M**2)
+    x_dot = eps/(3*np.pi**2)
+
+    return x_dot
+
+
 def Inte(f, kf, M):
     """
     this function computes the integral via scipy
@@ -317,7 +339,7 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
 
     return energ
 
-def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
+def Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
     """
     Computation of the system's total pressure
 
@@ -343,6 +365,8 @@ def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #fermi momenta
         kf_n = (3*(np.pi**2)*n_neu[i])**(1/3)
         kf_p = (3*(np.pi**2)*n_pro[i])**(1/3)
+        kf_e = (3*(np.pi**2)*n_ele[i])**(1/3)
+        kf_m = (3*(np.pi**2)*n_muo[i])**(1/3)
         #constants as the density varies
         g_sg = f(nb, 0)
         #effective masses
@@ -355,6 +379,9 @@ def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #nucleons pressure terms
         pre_p = Inte(pre, kf_p, m_eff_p)
         pre_n = Inte(pre, kf_n, m_eff_n)
+        #leptons pressure term
+        pre_e = Inte(pre_lep, kf_e, m_l[0])
+        pre_m = Inte(pre_lep, kf_m, m_l[1])
         #mesons derivative terms
         I_p = Inte(ns, kf_p, m_eff_p)
         I_n = Inte(ns, kf_n, m_eff_n)
@@ -362,7 +389,7 @@ def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #mesons pressure term
         pre_m2 = -0.5*(m_m[0]**2*sigma[i]**2 - m_m[1]**2*omega[i]**2 - m_m[2]**2*rho[i]**2)
         #system's total pressure
-        press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2
+        press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2 + pre_e + pre_m
 
     return press
 
@@ -428,7 +455,7 @@ n_muo = n_muo[1:]
 
 #energy and pressure computation
 ene_nb = Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho)
-pre_nb = Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho)
+pre_nb = Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho)
 
 #enrgy per nucleon
 E_over_A =  hbc*(ene_nb/nb_dens)
@@ -469,3 +496,11 @@ plt.grid()
 plt.plot(nb_dens, pre_nb)
 
 plt.show()
+##
+path = r"C:\Users\franc\Documents\magistrale\Tesi\codici\Materia asimmetrica\dati.txt"
+file = open(path, "w")
+file.write("# nb \t Yn \t Yp \t Ye \t Ym \t E/A \t P \n")
+for nb, n, p, e, m, ene, pre in zip(nb_dens, n_neu, n_pro, n_ele, n_muo, E_over_A, pre_nb):
+    file.write(f"{nb} \t {n/nb} \t {p/nb} \t {e/nb} \t {m/nb} \t {ene} \t{pre} \n")
+
+file.close()
