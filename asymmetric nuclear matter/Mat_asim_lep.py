@@ -6,9 +6,9 @@ and muons
 """
 import time
 import numpy as np
-from scipy import integrate
 import matplotlib.pyplot as plt
 from scipy.optimize import root
+from quad_gauss import adaptive_gaussian_quadrature
 
 #\hbar/c in MeV fermi
 hbc = 197.327
@@ -227,7 +227,7 @@ def Inte(f, kf, M):
     I : float
         \int_0^kf f(k, M) dk
     """
-    I, dI = integrate.quad(f, 0, kf, args=(M))
+    I = adaptive_gaussian_quadrature(f, 0, kf, args=(M,))
 
     return I
 
