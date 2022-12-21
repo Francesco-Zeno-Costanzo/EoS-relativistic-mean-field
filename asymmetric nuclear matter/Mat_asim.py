@@ -149,7 +149,7 @@ def ene(k, M):
     k : float
         momentum, integration variable
     M : float
-        effective mass m - g_sg * sigma
+        mass of particle
 
     Return
     ----------
@@ -193,7 +193,7 @@ def pre_lep(k, M):
     k : float
         momentum, integration variable
     M : float
-        effective mass m - g_sg * sigma
+        mass of particle
 
     Return
     ----------
@@ -315,8 +315,10 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #nucleons energies
         ene_p = Inte(ene, kf_p, m_eff_p)
         ene_n = Inte(ene, kf_n, m_eff_n)
+        #electrons energy term
+        ene_e = Inte(ene, kf_p, m_el)
         #system's total energy
-        energ[i] =  ene_m + ene_p + ene_n
+        energ[i] =  ene_m + ene_p + ene_n + ene_e
 
     return energ
 

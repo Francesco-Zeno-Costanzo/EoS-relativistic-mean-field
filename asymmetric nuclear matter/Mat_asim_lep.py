@@ -300,7 +300,7 @@ def sistema(V, nb, g_sg, g_om, g_rh, muon):
     return [r1, r2, r3, r4, r5, r6, r7]
 
 
-def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
+def Energia_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
     """
     Computation of the system's total energy
 
@@ -326,6 +326,8 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #fermi momenta
         kf_n = (3*(np.pi**2)*n_neu[i])**(1/3)
         kf_p = (3*(np.pi**2)*n_pro[i])**(1/3)
+        kf_e = (3*(np.pi**2)*n_ele[i])**(1/3)
+        kf_m = (3*(np.pi**2)*n_muo[i])**(1/3)
         #constants as the density varies
         g_sg = f(nb, 0)
         #effective masses
@@ -336,8 +338,11 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         #nucleons energies
         ene_p = Inte(ene, kf_p, m_eff_p)
         ene_n = Inte(ene, kf_n, m_eff_n)
+        #leptons energy term
+        ene_e = Inte(ene, kf_e, m_l[0])
+        ene_m = Inte(ene, kf_m, m_l[1])
         #system's total energy
-        energ[i] =  ene_m + ene_p + ene_n
+        energ[i] =  ene_m + ene_p + ene_n + ene_e + ene_m
 
     return energ
 
@@ -458,7 +463,7 @@ n_ele = n_ele[1:]
 n_muo = n_muo[1:]
 
 #energy and pressure computation
-ene_nb = Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho)
+ene_nb = Energia_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho)
 pre_nb = Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho)
 
 #enrgy per nucleon
