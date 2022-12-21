@@ -181,7 +181,7 @@ def pre(k, M):
     x_dot : float
         integrand function
     """
-    eps = k**2 / np.sqrt(k**2 + M**2)
+    eps = k**4 / np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
 
     return x_dot
@@ -196,7 +196,7 @@ def pre_lep(k, M):
     k : float
         momentum, integration variable
     M : float
-        effective mass m - g_sg * sigma
+        mass of particle
 
     Return
     ----------
@@ -220,7 +220,7 @@ def Inte(f, kf, M):
     kf : float
         fermi momentum, integral upper bound
     M : float
-        effective mass m - g_sg * sigma
+        mass
 
     Return
     -----------
@@ -230,6 +230,7 @@ def Inte(f, kf, M):
     I = adaptive_gaussian_quadrature(f, 0, kf, args=(M,))
 
     return I
+
 
 def sistema(V, nb, g_sg, g_om, g_rh, muon):
     """
@@ -298,6 +299,7 @@ def sistema(V, nb, g_sg, g_om, g_rh, muon):
 
     return [r1, r2, r3, r4, r5, r6, r7]
 
+
 def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
     """
     Computation of the system's total energy
@@ -338,6 +340,7 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         energ[i] =  ene_m + ene_p + ene_n
 
     return energ
+
 
 def Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
     """
@@ -392,6 +395,7 @@ def Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
         press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2 + pre_e + pre_m
 
     return press
+
 
 #computation parameters
 number_dens = 400
@@ -476,7 +480,7 @@ plt.plot(nb_dens, E_over_A)
 
 #abundances plot
 plt.figure(2)
-plt.title('Abbondanze in funzione della densità tottale')
+plt.title('Abbondanze in funzione della densità totale')
 plt.xlabel('densita [$fm^{-3}$]')
 plt.plot(nb_dens, n_pro/nb_dens, 'red', label='$n_p/n_b$')
 plt.plot(nb_dens, n_neu/nb_dens, 'black',label='$n_n/n_b$')

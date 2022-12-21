@@ -178,7 +178,7 @@ def pre_bar(k, M):
     x_dot : float
         integrand function
     """
-    eps = k**2 / np.sqrt(k**2 + M**2)
+    eps = k**4 / np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
 
     return x_dot
@@ -227,6 +227,7 @@ def Inte(f, kf, M):
     I = adaptive_gaussian_quadrature(f, 0, kf, args=(M,))
 
     return I
+
 
 def sistema(V, nb, g_sg, g_om, g_rh):
     """
@@ -277,6 +278,7 @@ def sistema(V, nb, g_sg, g_om, g_rh):
 
     return[r1 , r2, r3, r4, r5]
 
+
 def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
     """
     Computation of the system's total energy
@@ -317,6 +319,7 @@ def Energia_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
         energ[i] =  ene_m + ene_p + ene_n
 
     return energ
+
 
 def Pressione_totale(nb_dens, n_pro, n_neu, sigma, omega, rho):
     """
@@ -433,9 +436,10 @@ plt.plot(nb_dens, E_over_A)
 
 #abundances plot
 plt.figure(2)
-plt.title('Abbondanze in funzione della densità tottale')
-plt.plot(nb_dens, n_pro/nb_dens, label='np/nb')
-plt.plot(nb_dens, n_neu/nb_dens, label='nn/nb')
+plt.title('Abbondanze in funzione della densità totale')
+plt.xlabel('densita [$fm^{-3}$]')
+plt.plot(nb_dens, n_pro/nb_dens, 'red', label='$n_p/n_b$')
+plt.plot(nb_dens, n_neu/nb_dens, 'black',label='$n_n/n_b$')
 plt.legend(loc='best')
 #plt.xscale('log')
 plt.yscale('log')

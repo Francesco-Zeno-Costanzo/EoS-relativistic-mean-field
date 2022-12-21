@@ -155,7 +155,7 @@ def pre_bar(k, M):
     x_dot : float
         integrand function
     """
-    eps = k**2 / np.sqrt(k**2 + M**2)
+    eps = k**4 / np.sqrt(k**2 + M**2)
     x_dot = eps/(np.pi**2)
 
     return x_dot
@@ -248,7 +248,7 @@ def sistema(V, n, p, kf, g_sg, g_om, g_rh):
     return[r1 , r2, r3]
 
 #parameters
-number_dens = 1000
+number_dens = 100
 min_dens = 0.01
 max_dens = 0.2
 nb_sat = 0.152
@@ -406,7 +406,7 @@ plt.grid()
 plt.plot(nb_dens, E_over_A)
 
 #pressure plot
-plt.figure(3)
+plt.figure(2)
 plt.title('Pressione')
 plt.ylabel('P [Mev/$fm^3$]')
 plt.xlabel('densita [$fm^{-3}$]')
