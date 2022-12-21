@@ -187,28 +187,6 @@ def pre(k, M):
     return x_dot
 
 
-def pre_lep(k, M):
-    """
-    integral for the leptons pressure
-
-    Parameters
-    ----------
-    k : float
-        momentum, integration variable
-    M : float
-        mass of particle
-
-    Return
-    ----------
-    x_dot : float
-        integrand function
-    """
-    eps = k**4 / np.sqrt(k**2 + M**2)
-    x_dot = eps/(3*np.pi**2)
-
-    return x_dot
-
-
 def Inte(f, kf, M):
     """
     this function computes the integral via scipy
@@ -339,10 +317,10 @@ def Energia_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
         ene_p = Inte(ene, kf_p, m_eff_p)
         ene_n = Inte(ene, kf_n, m_eff_n)
         #leptons energy term
-        ene_e = Inte(ene, kf_e, m_l[0])
-        ene_m = Inte(ene, kf_m, m_l[1])
+        ene_e  = Inte(ene, kf_e, m_l[0])
+        ene_mu = Inte(ene, kf_m, m_l[1])
         #system's total energy
-        energ[i] =  ene_m + ene_p + ene_n + ene_e + ene_m
+        energ[i] =  ene_m + ene_p + ene_n + ene_e + ene_mu
 
     return energ
 
@@ -388,8 +366,8 @@ def Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
         pre_p = Inte(pre, kf_p, m_eff_p)
         pre_n = Inte(pre, kf_n, m_eff_n)
         #leptons pressure term
-        pre_e = Inte(pre_lep, kf_e, m_l[0])
-        pre_m = Inte(pre_lep, kf_m, m_l[1])
+        pre_e = Inte(pre, kf_e, m_l[0])
+        pre_m = Inte(pre, kf_m, m_l[1])
         #mesons derivative terms
         I_p = Inte(ns, kf_p, m_eff_p)
         I_n = Inte(ns, kf_n, m_eff_n)
@@ -397,7 +375,7 @@ def Pressione_totale(nb_dens, n_pro, n_neu, n_ele, n_muo, sigma, omega, rho):
         #mesons pressure term
         pre_m2 = -0.5*(m_m[0]**2*sigma[i]**2 - m_m[1]**2*omega[i]**2 - m_m[2]**2*rho[i]**2)
         #system's total pressure
-        press[i] = (1/3)*(pre_p + pre_n) + (n_neu[i]+n_pro[i])*pre_m1 + pre_m2 + pre_e + pre_m
+        press[i] = (1/3)*(pre_p + pre_n + pre_e + pre_m) + nb*pre_m1 + pre_m2
 
     return press
 
